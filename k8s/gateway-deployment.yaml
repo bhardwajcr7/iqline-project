@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+  namespace: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      serviceAccountName: app-sa
+      containers:
+      - name: gateway
+        image: iqlineprojectacr.azurecr.io/api-gateway:latest
+        ports:
+        - containerPort: 3000
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        env:
+        - name: USER_SERVICE_URL
+          value: "http://user-service.microservices.svc.cluster.local"
+        - name: ORDER_SERVICE_URL
+          value: "http://order-service.microservices.svc.cluster.local"
+        - name: APPINSIGHTS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-insights
+              key: ikey
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "300m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+  namespace: microservices
+spec:
+  selector:
+    app: gateway
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: ClusterIP
