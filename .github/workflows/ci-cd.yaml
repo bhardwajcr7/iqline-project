@@ -36,9 +36,7 @@ jobs:
     # ====== USER SERVICE ======
     - name: Test user-service
       run: |
-        ls -al
-        tree
-        cd user-service
+        cd services/user-service
         npm install
         npm test --if-present
 
@@ -50,7 +48,7 @@ jobs:
     # ====== ORDER SERVICE ======
     - name: Test order-service
       run: |
-        cd order-service
+        cd services/order-service
         npm install
         npm test --if-present
 
@@ -62,7 +60,7 @@ jobs:
     # ====== GATEWAY SERVICE ======
     - name: Test gateway
       run: |
-        cd api-gateway
+        cd services/api-gateway
         npm install
         npm test --if-present
 
