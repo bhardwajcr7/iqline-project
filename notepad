@@ -1,0 +1,30 @@
+1. Created directory tree and files for services.
+2. Built docker containers
+3. Pushed to Azure registry
+4.
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+acr_login_server = "iqlineprojectacr.azurecr.io"
+aks_name = "iqlineproject-aks"
+app_insights_key = <sensitive>
+kv_name = "iqlineproject-kv"
+resource_group = "iqlineproject-rg"
+
+
+
+
+{
+  "clientId": "3d4dfcd9-b55a-47a0-9c4c-2843985c628d",
+  "clientSecret": "tw48Q~Ymrw7sog.by~3CVcELtk9xFRsxg~BwWa4n",
+  "subscriptionId": "c84a106e-d18e-4ce4-bf1f-7d00bdae231f",
+  "tenantId": "f7ff7c74-d4ce-49ea-8c11-447574d95d0c",
+  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+  "resourceManagerEndpointUrl": "https://management.azure.com/",
+  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+  "galleryEndpointUrl": "https://gallery.azure.com/",
+  "managementEndpointUrl": "https://management.core.windows.net/"
+}
