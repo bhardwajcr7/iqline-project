@@ -42,7 +42,7 @@ jobs:
 
     - name: Build & Push user-service
       run: |
-        docker build -t $ACR_NAME.azurecr.io/user-service:${{ github.sha }} .
+        docker build -t $ACR_NAME.azurecr.io/user-service:${{ github.sha }} ./services/user-service
         docker push $ACR_NAME.azurecr.io/user-service:${{ github.sha }}
 
     # ====== ORDER SERVICE ======
@@ -54,7 +54,7 @@ jobs:
 
     - name: Build & Push order-service
       run: |
-        docker build -t $ACR_NAME.azurecr.io/order-service:${{ github.sha }} .
+        docker build -t $ACR_NAME.azurecr.io/order-service:${{ github.sha }} ./services/order-service
         docker push $ACR_NAME.azurecr.io/order-service:${{ github.sha }}
 
     # ====== GATEWAY SERVICE ======
@@ -66,7 +66,7 @@ jobs:
 
     - name: Build & Push api-gateway
       run: |
-        docker build -t $ACR_NAME.azurecr.io/api-gateway:${{ github.sha }} .
+        docker build -t $ACR_NAME.azurecr.io/api-gateway:${{ github.sha }} ./services/api-gateway
         docker push $ACR_NAME.azurecr.io/api-gateway:${{ github.sha }}
 
     # ====== Connect to AKS ======
