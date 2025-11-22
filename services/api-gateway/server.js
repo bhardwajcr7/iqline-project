@@ -1,13 +1,14 @@
 const express = require('express');
 const axios = require('axios');
 const app = express();
+const { version } = require('./package.json')
 const port = process.env.PORT || 3000;
 
 // Internal service DNS inside Kubernetes
 const USER_SERVICE = process.env.USER_SERVICE_URL || 'http://user-service.microservices.svc.cluster.local';
 const ORDER_SERVICE = process.env.ORDER_SERVICE_URL || 'http://order-service.microservices.svc.cluster.local';
 
-app.get('/health', (req, res) => res.json({ status: 'ok', service: 'api-gateway' }));
+app.get('/health', (req, res) => res.json({ status: 'ok', service: 'api-gateway', version }));
 
 app.get('/users', async (req, res) => {
   try {
