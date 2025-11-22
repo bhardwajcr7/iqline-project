@@ -1,0 +1,90 @@
+name: CI-CD-AKS
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  ACR_NAME: ${{ secrets.ACR_NAME }}
+  RG: ${{ secrets.AKS_RESOURCE_GROUP }}
+  CLUSTER: ${{ secrets.AKS_CLUSTER_NAME }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Azure ACR Login
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.ACR_NAME }}.azurecr.io
+        username: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}
+        password: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}
+
+    # ====== USER SERVICE ======
+    - name: Test user-service
+      run: |
+        cd user-service
+        npm install
+        npm test --if-present
+
+    - name: Build & Push user-service
+      run: |
+        docker build -t $ACR_NAME.azurecr.io/user-service:${{ github.sha }} ./user-service
+        docker push $ACR_NAME.azurecr.io/user-service:${{ github.sha }}
+
+    # ====== ORDER SERVICE ======
+    - name: Test order-service
+      run: |
+        cd order-service
+        npm install
+        npm test --if-present
+
+    - name: Build & Push order-service
+      run: |
+        docker build -t $ACR_NAME.azurecr.io/order-service:${{ github.sha }} ./order-service
+        docker push $ACR_NAME.azurecr.io/order-service:${{ github.sha }}
+
+    # ====== GATEWAY SERVICE ======
+    - name: Test gateway
+      run: |
+        cd api-gateway
+        npm install
+        npm test --if-present
+
+    - name: Build & Push api-gateway
+      run: |
+        docker build -t $ACR_NAME.azurecr.io/api-gateway:${{ github.sha }} ./api-gateway
+        docker push $ACR_NAME.azurecr.io/api-gateway:${{ github.sha }}
+
+    # ====== Connect to AKS ======
+    - name: Set kubectl context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+        cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+
+    # ====== Update Deployments ======
+    - name: Update deployments with new images
+      run: |
+        kubectl set image deployment/user-deployment user=$ACR_NAME.azurecr.io/user-service:${{ github.sha }} -n microservices
+        kubectl set image deployment/order-deployment order=$ACR_NAME.azurecr.io/order-service:${{ github.sha }} -n microservices
+        kubectl set image deployment/gateway-deployment gateway=$ACR_NAME.azurecr.io/api-gateway:${{ github.sha }} -n microservices
+
+    - name: Verify rollout
+      run: |
+        kubectl rollout status deployment/user-deployment -n microservices
+        kubectl rollout status deployment/order-deployment -n microservices
+        kubectl rollout status deployment/gateway-deployment -n microservices
