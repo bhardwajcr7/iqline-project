@@ -1,14 +1,3 @@
-const appInsights = require("applicationinsights");
-if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
-    appInsights.setup(process.env.APPINSIGHTS_INSTRUMENTATIONKEY)
-        .setAutoCollectRequests(true)
-        .setAutoCollectPerformance(true)
-        .setAutoCollectDependencies(true)
-        .setAutoCollectExceptions(true)
-        .setAutoDependencyCorrelation(true)
-        .start();
-}
-
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3001;

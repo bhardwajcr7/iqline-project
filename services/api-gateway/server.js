@@ -1,15 +1,3 @@
-// ----- Application Insights -----
-const appInsights = require("applicationinsights");
-if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
-    appInsights.setup(process.env.APPINSIGHTS_INSTRUMENTATIONKEY)
-        .setAutoCollectRequests(true)
-        .setAutoCollectPerformance(true)
-        .setAutoCollectDependencies(true)
-        .setAutoCollectExceptions(true)
-        .setAutoDependencyCorrelation(true)
-        .start();
-}
-
 const express = require('express');
 const axios = require('axios');
 const app = express();

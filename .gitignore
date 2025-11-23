@@ -1,7 +1,23 @@
+# Terraform local files and directories
+.terraform/         # Directory for provider binaries and modules
+*.tfstate           # Terraform state file (use remote state instead)
+*.tfstate.*         # Terraform state backup files
+*.tfvars            # Variable definition files (often contain sensitive data)
+.terraformrc        # Terraform CLI configuration file
+terraform.rc        # Terraform CLI configuration file
+
+# Crash log files
+crash.log
+
+# You should commit the .terraform.lock.hcl file to ensure consistent provider versions across teams.
+# If you are working solo and prefer to manage versions manually, you can optionally ignore it:
+# .terraform.lock.hcl
+
 # Dependencies
+notepad
 */*/node_modules
 .npm
-
+terraform_bak
 # Environment variables
 .env
 .env.development
