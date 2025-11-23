@@ -268,3 +268,16 @@ kubectl top pod -A --sort-by=cpu
 - Kubernetes manifests: `k8s/`
 - GitHub workflow: `.github/workflows/ci-cd-aks.yaml`
 
+## 19) Screenshots
+- AKS Dashboard
+![alt text](<AKS monitor dashboard.png>)
+
+- AKS Dashboard - Workloads
+![alt text](<AKS monitor dashboard - Workloads - Pods.png>)
+
+- AKS Dashboard - Prometheus
+![alt text](<AKS monitor dashboard - prometheus.png>)
+
+- AKS Dashboard - Prometheus - Controllers
+![alt text](<AKS monitor dashboard - prometheus - Controllers.png>)
+
