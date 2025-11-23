@@ -237,15 +237,7 @@ Also remove any GitHub secrets if created for the assignment.
 - `aks-set-context` failure: grant `Azure Kubernetes Service Cluster User Role` to the principal.
 
 ---
-## 16) Next steps (suggested)
-- Wire Key Vault to pods via Secrets Store CSI driver (avoid copying secrets to k8s secrets in prod)
-- Move GitHub Actions to OIDC federation (no client secret)
-- Add selective build/deploy logic (only deploy changed services)
-- Improve tests (unit + integration, and add smoke tests)
-- Add cost alerts for Log Analytics ingestion and set retention to 30 days for dev, 90 days for prod if needed
-
----
-## 17) Useful commands (quick cheatsheet)
+## 16) Useful commands (quick cheatsheet)
 ```bash
 # terraform
 terraform init
@@ -263,12 +255,12 @@ kubectl get pods -n kube-system | grep ama
 kubectl top pod -A --sort-by=cpu
 ```
 ---
-## 18) Artifacts for this assignment
+## 17) Artifacts for this assignment
 - Terraform stack: `terraform/stacks/dev`
 - Kubernetes manifests: `k8s/`
 - GitHub workflow: `.github/workflows/ci-cd-aks.yaml`
 
-## 19) Screenshots
+## 18) Screenshots
 - AKS Dashboard
 ![alt text](<AKS monitor dashboard.png>)
 
