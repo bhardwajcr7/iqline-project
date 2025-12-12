@@ -16,10 +16,24 @@ spec:
   - host: iqline.pscloud.in
     http:
       paths:
-      - path: /
+      - path: /health
         pathType: Prefix
         backend:
           service:
             name: gateway-service
+            port:
+              number: 80
+      - path: /users
+        pathType: Prefix
+        backend:
+          service:
+            name: user-service
+            port:
+              number: 80
+      - path: /orders
+        pathType: Prefix
+        backend:
+          service:
+            name: order-service
             port:
               number: 80

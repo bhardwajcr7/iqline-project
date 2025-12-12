@@ -8,7 +8,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: gateway-deployment
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 4
   behavior:
     scaleUp:
@@ -20,10 +20,10 @@ spec:
         - type: Pods
           value: 4
           periodSeconds: 10
-      selectPolicy: Max                  # use the most aggressive of the above
+      selectPolicy: Max
 
     scaleDown:
-      stabilizationWindowSeconds: 180
+      stabilizationWindowSeconds: 30
       policies:
         - type: Percent
           value: 50
@@ -35,4 +35,4 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 40
+        averageUtilization: 30

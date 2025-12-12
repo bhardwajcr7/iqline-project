@@ -1,0 +1,24 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: keda-hpa-gateway-traffic-scaler
+  namespace: microservices
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: gateway-deployment
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+  - type: External
+    external:
+      metric:
+        name: gateway_rps
+      target:
+        type: AverageValue
+        averageValue: "30"
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 30
+

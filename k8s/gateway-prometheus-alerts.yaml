@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: gateway-autoscaling-monitor
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: gateway-autoscaling.rules
+    rules:
+    # High RPS alert
+    - alert: GatewayHighRPS
+      expr: sum(rate(nginx_ingress_controller_requests{exported_service="gateway-service"}[1m])) > 30
+      for: 30s
+      labels:
+        severity: warning
+      annotations:
+        summary: "Gateway service is receiving high traffic"
+        description: "RPS is above 30 for more than 30 seconds"
+
+    # High Latency alert
+    - alert: GatewayHighLatency
+      expr: histogram_quantile(0.90, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{exported_service="gateway-service"}[2m])) by (le)) > 0.2
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Latency degradation detected"
+        description: "p90 latency > 200ms for over 1 minute"
+
+    # Max pod usage alert
+    - alert: GatewayMaxReplicasReached
+      expr: kube_deployment_status_replicas{deployment="gateway-deployment",namespace="microservices"} >= 4
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Gateway scaling limit reached"
+        description: "Deployment scaled to 4 pods. Auto-scale can’t go higher."
