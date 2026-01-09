@@ -31,12 +31,6 @@ spec:
             port: 3001
           initialDelaySeconds: 20
           periodSeconds: 20
-        env:
-        - name: APPINSIGHTS_INSTRUMENTATIONKEY
-          valueFrom:
-            secretKeyRef:
-              name: app-insights
-              key: ikey
         resources:
           requests:
             cpu: "100m"

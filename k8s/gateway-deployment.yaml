@@ -30,11 +30,6 @@ spec:
           value: "http://user-service.microservices.svc.cluster.local"
         - name: ORDER_SERVICE_URL
           value: "http://order-service.microservices.svc.cluster.local"
-        - name: APPINSIGHTS_INSTRUMENTATIONKEY
-          valueFrom:
-            secretKeyRef:
-              name: app-insights
-              key: ikey
         resources:
           requests:
             cpu: "100m"
