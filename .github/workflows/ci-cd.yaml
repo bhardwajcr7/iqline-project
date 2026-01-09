@@ -57,19 +57,16 @@ jobs:
     - name: Build & Push images
       run: |
         docker buildx build \
-          --platform linux/arm64 \
           -t $ACR_NAME.azurecr.io/user-service:${{ github.sha }} \
           ./services/user-service \
           --push
 
         docker buildx build \
-          --platform linux/arm64 \
           -t $ACR_NAME.azurecr.io/order-service:${{ github.sha }} \
           ./services/order-service \
           --push
 
         docker buildx build \
-          --platform linux/arm64 \
           -t $ACR_NAME.azurecr.io/api-gateway:${{ github.sha }} \
           ./services/api-gateway \
           --push
