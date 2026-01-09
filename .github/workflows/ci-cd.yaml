@@ -14,9 +14,8 @@ env:
   CLUSTER: ${{ secrets.AKS_CLUSTER_NAME }}
 
 jobs:
-  build-and-deploy:
+  ACR-Auth:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
@@ -33,6 +32,9 @@ jobs:
     - name: Login to ACR
       run: |
         az acr login --name $ACR_NAME
+  Test:
+    runs-on: ubuntu-latest
+    steps:
 
     # ====== USER SERVICE ======
     - name: Test user-service
@@ -41,11 +43,6 @@ jobs:
         npm install
         npm test --if-present
 
-    - name: Build & Push user-service
-      run: |
-        docker build -t $ACR_NAME.azurecr.io/user-service:${{ github.sha }} ./services/user-service
-        docker push $ACR_NAME.azurecr.io/user-service:${{ github.sha }}
-
     # ====== ORDER SERVICE ======
     - name: Test order-service
       run: |
@@ -53,30 +50,45 @@ jobs:
         npm install
         npm test --if-present
 
-    - name: Build & Push order-service
-      run: |
-        docker build -t $ACR_NAME.azurecr.io/order-service:${{ github.sha }} ./services/order-service
-        docker push $ACR_NAME.azurecr.io/order-service:${{ github.sha }}
-
     # ====== GATEWAY SERVICE ======
     - name: Test gateway
       run: |
         cd services/api-gateway
         npm install
         npm test --if-present
+  Build:
+    runs-on: ubuntu-latest
+    steps:
 
+    # ====== USER SERVICE ======
+    - name: Build & Push user-service
+      run: |
+        docker build -t $ACR_NAME.azurecr.io/user-service:${{ github.sha }} ./services/user-service
+        docker push $ACR_NAME.azurecr.io/user-service:${{ github.sha }}
+
+    # ====== ORDER SERVICE ======
+    - name: Build & Push order-service
+      run: |
+        docker build -t $ACR_NAME.azurecr.io/order-service:${{ github.sha }} ./services/order-service
+        docker push $ACR_NAME.azurecr.io/order-service:${{ github.sha }}
+
+    # ====== GATEWAY SERVICE ======
     - name: Build & Push api-gateway
       run: |
         docker build -t $ACR_NAME.azurecr.io/api-gateway:${{ github.sha }} ./services/api-gateway
         docker push $ACR_NAME.azurecr.io/api-gateway:${{ github.sha }}
-
+  AKS-Auth:
+    runs-on: ubuntu-latest
+    steps:
     # ====== Connect to AKS ======
     - name: Set kubectl context
       uses: azure/aks-set-context@v3
       with:
         resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
         cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
-
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
     # ====== Update Deployments ======
     - name: Update deployments with new images
       run: |
