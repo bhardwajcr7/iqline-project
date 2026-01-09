@@ -16,7 +16,7 @@ spec:
       serviceAccountName: app-sa
       containers:
       - name: order
-        image: iqlineprojectacr.azurecr.io/order-service:latest
+        image: sanyogacr.azurecr.io/order-service:latest
         ports:
         - containerPort: 3002
         readinessProbe:

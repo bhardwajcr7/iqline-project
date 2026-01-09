@@ -16,7 +16,7 @@ spec:
       serviceAccountName: app-sa
       containers:
       - name: user
-        image: iqlineprojectacr.azurecr.io/user-service:latest
+        image: sanyogacr.azurecr.io/user-service:latest
         ports:
         - containerPort: 3001
         readinessProbe:

@@ -16,7 +16,7 @@ spec:
       serviceAccountName: app-sa
       containers:
       - name: gateway
-        image: iqlineprojectacr.azurecr.io/api-gateway:latest
+        image: sanyogacr.azurecr.io/api-gateway:latest
         ports:
         - containerPort: 3000
         readinessProbe:
