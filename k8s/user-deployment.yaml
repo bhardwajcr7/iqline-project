@@ -16,7 +16,7 @@ spec:
       serviceAccountName: app-sa
       containers:
       - name: user
-        image: sanyogacr.azurecr.io/user-service:latest
+        image: sanyogacr.azurecr.io/user-service:eb0008cb99c538ab22f5bd513565e864f07bdec9
         ports:
         - containerPort: 3001
         readinessProbe:
