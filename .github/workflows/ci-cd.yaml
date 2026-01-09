@@ -14,83 +14,78 @@ env:
   CLUSTER: ${{ secrets.AKS_CLUSTER_NAME }}
 
 jobs:
-  ACR-Auth:
+  test:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    # ====== Azure Login using OIDC ======
-    - name: Login to Azure (OIDC)
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-    # ====== Login to ACR (no username/password) ======
-    - name: Login to ACR
-      run: |
-        az acr login --name $ACR_NAME
-  Test:
-    runs-on: ubuntu-latest
-    steps:
-
-    # ====== USER SERVICE ======
     - name: Test user-service
       run: |
         cd services/user-service
         npm install
         npm test --if-present
 
-    # ====== ORDER SERVICE ======
     - name: Test order-service
       run: |
         cd services/order-service
         npm install
         npm test --if-present
 
-    # ====== GATEWAY SERVICE ======
     - name: Test gateway
       run: |
         cd services/api-gateway
         npm install
         npm test --if-present
-  Build:
+  build:
     runs-on: ubuntu-latest
-    steps:
+    needs: test
 
-    # ====== USER SERVICE ======
-    - name: Build & Push user-service
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Azure Login (OIDC)
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Login to ACR
+      run: az acr login --name $ACR_NAME
+
+    - name: Build & Push images
       run: |
         docker build -t $ACR_NAME.azurecr.io/user-service:${{ github.sha }} ./services/user-service
         docker push $ACR_NAME.azurecr.io/user-service:${{ github.sha }}
 
-    # ====== ORDER SERVICE ======
-    - name: Build & Push order-service
-      run: |
         docker build -t $ACR_NAME.azurecr.io/order-service:${{ github.sha }} ./services/order-service
         docker push $ACR_NAME.azurecr.io/order-service:${{ github.sha }}
 
-    # ====== GATEWAY SERVICE ======
-    - name: Build & Push api-gateway
-      run: |
         docker build -t $ACR_NAME.azurecr.io/api-gateway:${{ github.sha }} ./services/api-gateway
         docker push $ACR_NAME.azurecr.io/api-gateway:${{ github.sha }}
-  AKS-Auth:
+  deploy:
     runs-on: ubuntu-latest
+    needs: build
+
     steps:
-    # ====== Connect to AKS ======
-    - name: Set kubectl context
-      uses: azure/aks-set-context@v3
+    - uses: actions/checkout@v4
+
+    - name: Azure Login (OIDC)
+      uses: azure/login@v2
       with:
-        resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
-        cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
-  Deploy:
-    runs-on: ubuntu-latest
-    steps:
-    # ====== Update Deployments ======
-    - name: Update deployments with new images
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Get AKS credentials
+      run: |
+        az aks get-credentials \
+          --resource-group $RG \
+          --name $CLUSTER \
+          --overwrite-existing
+
+    - name: Update deployments
       run: |
         kubectl set image deployment/user-deployment user=$ACR_NAME.azurecr.io/user-service:${{ github.sha }} -n microservices
         kubectl set image deployment/order-deployment order=$ACR_NAME.azurecr.io/order-service:${{ github.sha }} -n microservices
